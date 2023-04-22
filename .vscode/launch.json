@@ -11,7 +11,7 @@
             "program": "${file}",
             "args": [
                 "<",
-                "${workspaceFolder}/aula2/in.txt"
+                "${fileDirname}/in.txt"
             ],
             "console": "integratedTerminal",
             "justMyCode": true

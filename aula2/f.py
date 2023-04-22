@@ -1,16 +1,11 @@
 import sys
 
-SUM = 0
 yes = False
-ch = ''
 
-
-def read_tree(val):
-    global ch, yes, SUM
-    child1 = False
-    child2 = False
-    thisval = 0
-    sign = 1
+def read_tree(val, sum):
+    global ch, yes
+    child1, child2 = False, False
+    thisval, sign = 0, 1
     while True:
         ch = sys.stdin.read(1)
         if ch == ' ' or ch == '\n':
@@ -26,14 +21,16 @@ def read_tree(val):
 
     thisval *= sign
     val += thisval
-    child1 = read_tree(val)
 
+    child1 = read_tree(val, sum)
     while True:
         ch = sys.stdin.read(1)
         if ch == '(':
-            child2 = read_tree(val)
             break
-    if not child1 and not child2 and val == SUM:
+    
+    child2 = read_tree(val, sum)
+    
+    if not child1 and not child2 and val == sum:
         yes = True
 
     while True:
@@ -49,22 +46,23 @@ while True:
             ch = sys.stdin.read(1)
             if ch == '\n':
                 continue
-            if ch == '':  # tentativa de finalização do programa
-                exit()
             if ch == ' ':
                 break
             if ch.isdigit():
                 SUM = SUM*10 + int(ch)
+            if ch == '':
+                break # sair do loop se a linha estiver vazia
+
+        if ch == '':
+            break # sair do loop se a linha estiver vazia
+               
         yes = False
         while True:
             ch = sys.stdin.read(1)
             if ch == '(':
-                read_tree(0)
+                read_tree(0, SUM)
                 break
-        if yes:
-            print("yes")
-        else:
-            print("no")
+        print("yes" if yes else "no")
 
     except:
         break
