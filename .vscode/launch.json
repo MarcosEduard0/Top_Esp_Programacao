@@ -11,7 +11,7 @@
             "program": "${file}",
             "args": [
                 "<",
-                "${fileDirname}/in.txt"
+                "${fileDirname}\\in.txt"
             ],
             "console": "integratedTerminal",
             "justMyCode": true
