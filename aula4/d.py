@@ -2,7 +2,7 @@ import sys
 from collections import deque
 
 
-def bfs(Adj, edges, cols, u):
+def bfs(Adj, arestas, cols, u):
     nxts = deque([u])
     cols[u] = 0
 
@@ -12,17 +12,16 @@ def bfs(Adj, edges, cols, u):
         for w in Adj[v]:
             ed = tuple(sorted([v, w]))
             if cols[w] is None:
-                cols[w] = cols[v] ^ edges[ed]
+                cols[w] = cols[v] ^ arestas[ed]
                 nxts.append(w)
             else:
-                if cols[w] ^ cols[v] != edges[ed]:
+                if cols[w] ^ cols[v] != arestas[ed]:
                     return False
 
     return True
 
-
 n, m = map(int, sys.stdin.readline().split())
-r = [1 - int(i) for i in sys.stdin.readline().split()]
+status = [1 - int(i) for i in sys.stdin.readline().split()]
 es = [[] for i in range(n)]
 
 for i in range(m):
@@ -31,21 +30,21 @@ for i in range(m):
     for u in line[1:]:
         es[u - 1].append(i)
 
-Adj = [[] for i in range(m)]
+Adj = [[] for _ in range(m)]
 
 for u, v in es:
     Adj[u].append(v)
     Adj[v].append(u)
 
-edges = dict()
+arestas = dict()
 
 for i, e in enumerate(es):
     e.sort()
-    if tuple(e) not in edges:
-        edges[tuple(e)] = r[i]
-    elif edges[tuple(e)] != r[i]:
+    if tuple(e) not in arestas:
+        arestas[tuple(e)] = status[i]
+    elif arestas[tuple(e)] != status[i]:
         print('NO')
-        exit()
+        quit()
     else:
         pass
 
@@ -53,9 +52,9 @@ cols = [None] * m
 
 for u in range(m):
     if cols[u] is None:
-        if not bfs(Adj, edges, cols, u):
+        if not bfs(Adj, arestas, cols, u):
             print('NO')
-            exit()
+            quit()
         else:
             pass
 
