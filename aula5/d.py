@@ -1,0 +1,1 @@
+for g in[*open(0)][1:]:print((int(g)+1)//10)
