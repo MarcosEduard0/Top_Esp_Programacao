@@ -1,33 +1,33 @@
 N = int(input())
-a, b = [], []
+inicial, desejado = [], []
 
 for n in range(N):
-    a.append(input())
+    inicial.append(input())
 
 for n in range(N):
-    b.append(input())
+    desejado.append(input())
 
-wand = input()
-piv = -1 if wand.count('1') == 0 else wand.index('1')
+barra = input()
+initB = -1 if barra.count('1') == 0 else barra.index('1')
 
 
 def getVar(ca, row, col):
-    v = int(a[row][col]) ^ (int(wand[row]) * ca[col])
-    if v == v ^ int(wand[col]):
-        if v == int(b[row][col]):
+    v = int(inicial[row][col]) ^ (int(barra[row]) * ca[col])
+    if v == v ^ int(barra[col]):
+        if v == int(desejado[row][col]):
             return None
         else:
             return False
-    return v != int(b[row][col])
+    return v != int(desejado[row][col])
 
 
-if piv < 0:
-    print(0 if a == b else -1)
+if initB < 0:
+    print(0 if inicial == desejado else -1)
 else:
     rowActions, colActions = [], []
 
     for n in range(N):
-        if a[piv][n] != b[piv][n]:
+        if inicial[initB][n] != desejado[initB][n]:
             colActions.append(1)
         else:
             colActions.append(0)

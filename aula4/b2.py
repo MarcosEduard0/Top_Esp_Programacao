@@ -1,58 +1,97 @@
-from collections import defaultdict
-from queue import PriorityQueue
+import sys
+input = lambda: sys.stdin.readline().rstrip("\r\n")
+
+def find_strongly_connected_components(graph):
+    scc = []
+    S = []
+    P = []
+    depth = [0] * len(graph)
+    stack = list(range(len(graph)))
+
+    while stack:
+        node = stack.pop()
+
+        if node < 0:
+            d = depth[~node] - 1
+
+            if P[-1] > d:
+                scc.append(S[d:])
+                del S[d:]
+                del P[-1]
+
+                for node in scc[-1]:
+                    depth[node] = -1
+
+        elif depth[node] > 0:
+            while P[-1] > depth[node]:
+                P.pop()
+
+        elif depth[node] == 0:
+            S.append(node)
+            P.append(len(S))
+            depth[node] = len(S)
+            stack.append(~node)
+            stack += graph[node]
+
+    scc = scc[::-1]
+    component_index = [-1] * len(graph)
+
+    for i in range(len(scc)):
+        for j in scc[i]:
+            component_index[j] = i
+
+    return component_index
 
 
-def find_station(stations, complaint):
-    # Encontra a estação com a menor restrição inferior de sinal que pode cobrir a cidade
-    x, y = complaint
-    print("d")
-    candidates = [(stations[x][0], x), (stations[y][0], y)]
-    candidates = sorted(candidates)
-    for _, i in candidates:
-        if complaint not in covered[i]:
-            return i
-    return -1
+for _ in range(int(input()) if not True else 1):
+    n, p, M, m = map(int, input().split())
 
+    graph = [[] for _ in range(2 * p + 2 * M + 1)]
 
-def dfs(u, color):
-    # Verifica se todas as estações selecionadas são mutuamente compatíveis
-    for v in graph[u]:
-        if colors[v] == color:
-            return False
-        if colors[v] == 0:
-            colors[v] = -color
-            if not dfs(v, -color):
-                return False
-    return True
+    for i in range(n):
+        x, y = map(int, input().split())
+        x2 = (x + p)
+        y2 = (y + p)
+        graph[x2].append(y)
+        graph[y2].append(x)
 
+    for x in range(1, p + 1):
+        l, r = map(int, input().split())
+        x2 = (x + p)
+        l += 2 * p
+        r += 2 * p + 1
+        graph[l+M].append(x2)
+        graph[x].append(l)
 
-n, p, M, m = map(int, input().split())
-complaints = [tuple(map(int, input().split())) for _ in range(n)]
-stations = [tuple(map(int, input().split())) for _ in range(p)]
-interferences = [tuple(map(int, input().split())) for _ in range(m)]
+        if r + M != 2 * p + 2 * M + 1:
+            graph[r].append(x2)
+            graph[x].append(r + M)
 
-# covered[i] é um conjunto de reclamações que a estação i pode cobrir
-covered = defaultdict(set)
-for i, (li, ri) in enumerate(stations):
-    for j, complaint in enumerate(complaints):
-        x, y = complaint
-        if li <= M and li <= min(stations[x][1], stations[y][1]):
-            covered[i].add(j)
+    for i in range(m):
+        x, y = map(int, input().split())
+        x2 = (x + p)
+        y2 = (y + p)
+        graph[x].append(y2)
+        graph[y].append(x2)
 
-# graph[i] é um conjunto de estações que interferem com a estação i
-graph = [[] for _ in range(p)]
-for i, (ui, vi) in enumerate(interferences):
-    ui -= 1
-    vi -= 1
-    graph[ui].append(vi)
-    graph[vi].append(ui)
+    for i in range(1, M):
+        graph[2 * p + i + M].append(2 * p + i + M + 1)
+        graph[2 * p + i + 1].append(2 * p + i)
 
-# colors[i] é a cor (1 ou -1) atribuída à estação i durante a coloração de grafos
-colors = [0] * p
-stations_selected = set()
-for j, complaint in enumerate(complaints):
-    i = find_station(stations, complaint)
-    if i == -1:
-        print("-1")
-        exit()
-   
+    component_index = find_strongly_connected_components(graph)
+    ans = []
+
+    for i in range(1, p + 1):
+        if component_index[i] > component_index[i + p]:
+            ans.append(i)
+
+    if not ans:
+        print(-1)
+        break
+
+    for freq in range(M, 0, -1):
+        if component_index[2 * p + freq] > component_index[2 * p + freq + M]:
+            break
+
+    print(len(ans), freq)
+    print(*ans)
